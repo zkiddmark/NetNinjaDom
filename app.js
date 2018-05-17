@@ -39,14 +39,84 @@
 // });
 
 //EVENT BUBBLING
+document.addEventListener('DOMContentLoaded', () => {
 
-const list = document.querySelector('#book-list ul');
+    const list = document.querySelector('#book-list ul');
 
-list.addEventListener('click', (e) => {
-    if(e.target.className === 'delete'){
-        const li = e.target.parentElement;
-        list.removeChild(li);
+    list.addEventListener('click', (e) => {
+        if(e.target.className === 'delete'){
+            const li = e.target.parentElement;
+            list.removeChild(li);
+        }
+        
+    })
+
+
+    //add book-list
+
+    const addForm = document.forms['add-book'];
+
+    addForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const value = addForm.querySelector('input[type="text"]').value;
+        addNewBook(value);
+        addForm.querySelector('input[type="text"]').value = ''
+    });
+
+    //add new Book
+    function addNewBook(title) {
+        const html = `
+            <li>
+                <span class="name">${title}</span>
+                <span class="delete">delete</span>
+            </li>
+        `;
+        list.insertAdjacentHTML('beforeend', html);
     }
-    
-})
 
+    //hide books
+    const hideBox = document.querySelector('#hide');
+
+    hideBox.addEventListener('change', (e) => {
+        if(hideBox.checked){
+            list.style.display = 'none';
+        } else {
+            list.style.display = 'initial';
+        }
+    });
+
+    //search filter
+    const searchForm = document.forms['search-books'].querySelector('input');
+
+    searchForm.addEventListener('keyup', (e) => {
+        let value = new RegExp(`${e.target.value}`, 'gi');
+        const allBooks = list.querySelectorAll("li");
+        const results = Array.from(allBooks).filter(book => {
+            if(!book.firstElementChild.textContent.toLowerCase().match(value)){
+                book.style.display = 'none';
+            } else {
+                book.style.display = 'block'
+            }
+        });
+    });
+
+
+    //Panels
+
+    const tabs = document.querySelector('.tabs');
+    const panels = document.querySelectorAll('.panel');
+
+    tabs.addEventListener('click', (e) => {
+        if(e.target.tagName == 'LI'){
+            const targetPanel = document.querySelector(e.target.dataset.target)
+            panels.forEach(panel => {
+                if(panel == targetPanel){
+                    panel.classList.add('active');
+                } else {
+                    panel.classList.remove('active');
+                }
+            });
+        };
+    });
+
+});
